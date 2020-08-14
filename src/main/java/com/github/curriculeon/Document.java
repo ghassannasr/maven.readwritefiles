@@ -2,6 +2,7 @@ package com.github.curriculeon;
 
 import java.io.*;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author leon on 16/11/2018.
@@ -20,21 +21,56 @@ public class Document implements DocumentInterface {
         this.fileWriter = new FileWriter(file);
     }
 
-    @Override
-    public void write(String contentToBeWritten) {
+    @Override  //GN added method body
+    public void write(String contentToBeWritten)  {
+        BufferedWriter bufferedWriter = new BufferedWriter(this.fileWriter);
+
+        try {
+            bufferedWriter.write(contentToBeWritten);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (bufferedWriter != null) {
+            try {
+                bufferedWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void write(Integer lineNumber, String valueToBeWritten) {
+
     }
 
     @Override
     public String read(Integer lineNumber) {
+
         return null;
     }
 
     @Override
     public String read() {
+        try {
+
+            FileReader fileReader = new FileReader(this.file);
+            StringBuilder contents = new StringBuilder("");
+            int c;
+            while(( c = fileReader.read()) != -1) {
+                contents.append((char)c);
+            }
+
+            fileReader.close();
+            return contents.toString();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
