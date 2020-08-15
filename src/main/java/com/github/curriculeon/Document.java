@@ -1,8 +1,20 @@
 package com.github.curriculeon;
 
 import java.io.*;
+//import java.io.FileWriter;
+//import java.io.File;
+//import java.io.IOException;
+//import java.io.BufferedReader;
+//import java.io.BufferedWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Paths;
+//import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 /**
  * @author leon on 16/11/2018.
@@ -21,65 +33,53 @@ public class Document implements DocumentInterface {
         this.fileWriter = new FileWriter(file);
     }
 
-    @Override  //GN added method body
-    public void write(String contentToBeWritten)  {
-        BufferedWriter bufferedWriter = new BufferedWriter(this.fileWriter);
+    @Override
+    public void write(String contentToBeWritten) throws IOException {
+        this.fileWriter.write(contentToBeWritten);
+        this.fileWriter.flush();
+    }
 
-        try {
-            bufferedWriter.write(contentToBeWritten);
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    public void write(Integer lineNumber, String valueToBeWritten) throws IOException {
+        Path path = file.toPath();
+        String[] lines = this.read().split("\n");
+        lines[lineNumber] = valueToBeWritten;
+        StringBuilder stringBuilder = new StringBuilder("");
+        for(String s: lines) {
+            stringBuilder.append(s + "\n");
         }
 
-        if (bufferedWriter != null) {
-            try {
-                bufferedWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        this.overWrite(stringBuilder.toString().trim());
+    }
+
+    @Override
+    public String read(Integer lineNumber) throws IOException {
+        String[] lines = this.read().split("\n");
+        return lines[lineNumber];
+    }
+
+    @Override
+    public String read() throws IOException {
+        StringBuilder contents = new StringBuilder("");
+        Path path = file.toPath();
+        BufferedReader bufferedReader = Files.newBufferedReader(path);
+        while(bufferedReader.ready()) {
+            contents.append((char)(bufferedReader.read()));
         }
+        return contents.toString();
     }
 
     @Override
-    public void write(Integer lineNumber, String valueToBeWritten) {
-
+    public void replaceAll(String stringToReplace, String replacementString) throws IOException {
+        String fileAsString = this.read();
+        String newString = fileAsString.replaceAll(stringToReplace, replacementString);
+        this.overWrite(newString);
     }
 
     @Override
-    public String read(Integer lineNumber) {
-
-        return null;
-    }
-
-    @Override
-    public String read() {
-        try {
-
-            FileReader fileReader = new FileReader(this.file);
-            StringBuilder contents = new StringBuilder("");
-            int c;
-            while(( c = fileReader.read()) != -1) {
-                contents.append((char)c);
-            }
-
-            fileReader.close();
-            return contents.toString();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Override
-    public void replaceAll(String stringToReplace, String replacementString) {
-    }
-
-    @Override
-    public void overWrite(String content) {
+    public void overWrite(String content) throws IOException {
+        Path path = file.toPath();
+        Files.write(path, content.getBytes());
     }
 
     public List<String> toList() {
@@ -88,11 +88,16 @@ public class Document implements DocumentInterface {
 
     @Override
     public File getFile() {
-        return null;
+        return this.file;
     }
 
     @Override
     public String toString() {
+        try {
+            return this.file.getPath() + "{" + this.read() + "}";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
