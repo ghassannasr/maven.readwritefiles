@@ -11,10 +11,16 @@ public class SpecialCharDocument extends Document {
     }
 
     @Override
-    public void write(String contentToBeWritten) {
+    public void write(String contentToBeWritten) throws IOException {
+        if(isSpecialCharacters(contentToBeWritten)) {
+            super.write(contentToBeWritten);
+        }
+        else {
+            throw new IllegalArgumentException("String contains special characters.");
+        }
     }
 
     private Boolean isSpecialCharacters(String s) {
-        return null;
+        return s != null && !s.matches("^[\\sa-zA-Z0-9]*$");
     }
 }

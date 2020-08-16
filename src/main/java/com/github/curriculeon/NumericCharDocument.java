@@ -11,10 +11,16 @@ public class NumericCharDocument extends Document {
     }
 
     @Override
-    public void write(String contentToBeWritten) {
+    public void write(String contentToBeWritten) throws IOException {
+        if(isNumeric(contentToBeWritten)) {
+            super.write(contentToBeWritten);
+        }
+        else {
+            throw new IllegalArgumentException("String contains non-numeric characters.");
+        }
     }
 
     private Boolean isNumeric(String s) {
-        return null;
+        return s != null && s.matches("^[0-9]*$");
     }
 }
